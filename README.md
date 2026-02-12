@@ -1,29 +1,43 @@
 # Terraform AI Plan Analyzer Demo
 
-Minimal demo for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.com/dr-rahulgaikwad/terraform-runtask-aws-ai-tf-plan-analyzer).
+Demo for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.com/dr-rahulgaikwad/terraform-runtask-aws-ai-tf-plan-analyzer).
 
-## Quick Start
+## Usage
+
+The AI Run Task analyzer will evaluate the Terraform plan during `terraform plan` in HCP Terraform.
 
 ```bash
 terraform init
 terraform plan
-terraform apply
-terraform destroy
 ```
 
 ## HCP Terraform Setup
 
-### AWS Credentials (Environment Variables)
-- `AWS_ACCESS_KEY_ID` (sensitive)
-- `AWS_SECRET_ACCESS_KEY` (sensitive)
+1. **AWS Credentials** (Environment Variables):
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
 
-### Terraform Variables
-- `aws_region` - AWS region (default: us-east-1)
-- `ami_id` - AMI ID for your region (default: ami-0e2c8caa4b6378d8c)
+2. **Terraform Variables**:
+   - `aws_region` (default: us-east-1)
+   - `ami_id` (default: ami-0e2c8caa4b6378d8c)
+   - `enable_large_instance` (default: false)
 
-## What the AI Analyzer Will Check
+3. **Configure Run Task**:
+   - Stage: Post-plan
+   - Enforcement: Advisory
 
-- EC2 instance type availability
-- AMI validation
-- Cost estimation (~$7-8/month for t3.micro)
-- Best practices recommendations
+## What the AI Analyzer Checks
+
+- EC2 instance type validation
+- AMI availability
+- Cost estimation
+- Cost threshold alerts (when `enable_large_instance = true`)
+
+### Cost Scenarios
+
+- `enable_large_instance = false`: ~$8/month (t3.micro)
+- `enable_large_instance = true`: ~$280/month (adds m5.2xlarge)
+
+## Note
+
+This demo is designed to trigger the AI Run Task analyzer. You don't need to apply - just run `terraform plan` in HCP Terraform to see the AI analysis.

@@ -22,15 +22,35 @@ variable "ami_id" {
   default = "ami-0e2c8caa4b6378d8c"
 }
 
-resource "aws_instance" "demo" {
+variable "enable_large_instance" {
+  type    = bool
+  default = false
+}
+
+resource "aws_instance" "small" {
   ami           = var.ami_id
   instance_type = "t3.micro"
 
   tags = {
-    Name = "demo-instance"
+    Name = "demo-small"
   }
 }
 
-output "instance_id" {
-  value = aws_instance.demo.id
+resource "aws_instance" "large" {
+  count = var.enable_large_instance ? 1 : 0
+
+  ami           = var.ami_id
+  instance_type = "m5.2xlarge"
+
+  tags = {
+    Name = "demo-large"
+  }
+}
+
+output "small_instance_id" {
+  value = aws_instance.small.id
+}
+
+output "estimated_cost" {
+  value = var.enable_large_instance ? "~$280/month" : "~$8/month"
 }
