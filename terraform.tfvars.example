@@ -1,0 +1,10 @@
+# AWS Region
+aws_region = "us-east-1"
+
+# Environment name (used in resource naming)
+environment = "demo"
+
+# Enable risky resources for comprehensive demo
+# Set to false for minimal, production-like deployment (~$10-15/month)
+# Set to true for full demo with all scenarios (~$350-400/month)
+enable_risky_resources = true
