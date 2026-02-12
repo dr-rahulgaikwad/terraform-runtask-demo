@@ -1,10 +1,14 @@
 # AWS Region
 aws_region = "us-east-1"
 
-# Environment name (used in resource naming)
+# Environment name
 environment = "demo"
 
-# Enable additional instances for comprehensive cost demo
+# Enable large instances for cost demo (~$350-400/month)
 # Set to false for minimal deployment (~$15-20/month)
-# Set to true for full demo with cost analysis (~$350-400/month)
-enable_risky_resources = true
+enable_large_instances = false
+
+# AMI IDs (update for your region if needed)
+# us-east-1 Amazon Linux 2023 AMIs
+ami_id     = "ami-0e2c8caa4b6378d8c"
+ami_id_arm = "ami-0ddc798b3f1a5117e"
