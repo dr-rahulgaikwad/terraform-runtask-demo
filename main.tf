@@ -501,3 +501,4 @@ output "estimated_monthly_cost" {
   description = "Rough estimate of monthly costs (for reference)"
   value       = var.enable_risky_resources ? "~$350-400/month" : "~$10-15/month"
 }
+
