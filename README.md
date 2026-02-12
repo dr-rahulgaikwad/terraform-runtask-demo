@@ -4,12 +4,10 @@ Minimal AWS Terraform demo for [terraform-runtask-aws-ai-tf-plan-analyzer](https
 
 ## What's Included
 
-Demonstrates all 4 validator tools with realistic scenarios:
+Demonstrates EC2Validator and CostEstimator with realistic scenarios:
 
-- **EC2Validator**: Valid instances, ARM Graviton, large instances, deprecated AMIs
-- **S3Validator**: Encrypted buckets (AES256/KMS), unencrypted buckets, public access
-- **SecurityGroupValidator**: Secure rules, risky exposures (SSH, RDP, databases), IPv6
-- **CostEstimator**: Monthly cost estimates, threshold alerts
+- **EC2Validator**: Valid instances with encryption and IMDSv2, ARM Graviton instances, large instances
+- **CostEstimator**: Monthly cost estimates, threshold alerts for cost increases
 
 ## Quick Start
 
@@ -17,13 +15,13 @@ Demonstrates all 4 validator tools with realistic scenarios:
 # Initialize
 terraform init
 
-# Plan with minimal resources (low cost ~$10-15/month)
+# Plan with minimal resources (~$15-20/month)
 terraform plan -var="enable_risky_resources=false"
 
-# Plan with all scenarios (higher cost ~$350-400/month)
+# Plan with all scenarios (~$350-400/month)
 terraform plan -var="enable_risky_resources=true"
 
-# Apply (optional)
+# Apply
 terraform apply
 
 # Cleanup
@@ -37,7 +35,7 @@ terraform destroy
 cp terraform.tfvars.example terraform.tfvars
 
 # Edit as needed
-# - Set enable_risky_resources=false for minimal deployment (~$10-15/month)
+# - Set enable_risky_resources=false for minimal deployment (~$15-20/month)
 # - Set enable_risky_resources=true for full demo (~$350-400/month)
 ```
 
@@ -45,31 +43,24 @@ cp terraform.tfvars.example terraform.tfvars
 
 ### With `enable_risky_resources = true`:
 
-**Critical (🔴)**
-- Public S3 bucket
-- Unencrypted S3 bucket
-- Security groups exposing SSH, RDP, MySQL, PostgreSQL to 0.0.0.0/0
-- IAM wildcard permissions
-- Invalid AMI
-
 **Warnings (🟡)**
 - Large instance (m5.2xlarge ~$280/month)
 - Cost increase >20% threshold
-- IPv6 exposure
+- Multiple instances increasing cost footprint
 
 **Good Practices (🟢)**
-- KMS encrypted S3 buckets
-- IMDSv2 enforced
-- Restrictive security groups
-- Least privilege IAM
+- IMDSv2 enforced on EC2 instances
+- EBS encryption enabled
+- ARM Graviton instances for cost optimization
 
 **Cost (💰)**
 - Per-resource monthly estimates
 - Total: ~$350-400/month
+- Cost breakdown by instance type
 
 ### With `enable_risky_resources = false`:
 
-Only secure resources with best practices, ~$10-15/month
+Only secure resources with best practices, ~$15-20/month
 
 ## Prerequisites
 
@@ -79,6 +70,6 @@ Only secure resources with best practices, ~$10-15/month
 
 ## Notes
 
-- AMI IDs may need updating for your region
-- Risky resources are intentionally insecure for demonstration
-- Use `enable_risky_resources=false` for production-like deployments
+- Uses data sources to fetch latest Amazon Linux 2 AMIs automatically
+- Demonstrates cost analysis with various instance types
+- ARM Graviton instances show cost optimization opportunities
