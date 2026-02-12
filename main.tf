@@ -17,40 +17,45 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "ami_id" {
+variable "instance_type" {
   type    = string
-  default = "ami-0e2c8caa4b6378d8c"
+  default = "t3.micro"
 }
 
-variable "enable_large_instance" {
-  type    = bool
-  default = false
-}
+resource "aws_instance" "web" {
+  ami           = "ami-0e2c8caa4b6378d8c"
+  instance_type = var.instance_type
 
-resource "aws_instance" "small" {
-  ami           = var.ami_id
-  instance_type = "t3.micro"
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
 
   tags = {
-    Name = "demo-small"
+    Name        = "web-server"
+    Environment = "demo"
   }
 }
 
-resource "aws_instance" "large" {
-  count = var.enable_large_instance ? 1 : 0
+resource "aws_instance" "app" {
+  ami           = "ami-0e2c8caa4b6378d8c"
+  instance_type = "t3.small"
 
-  ami           = var.ami_id
-  instance_type = "m5.2xlarge"
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp3"
+  }
 
   tags = {
-    Name = "demo-large"
+    Name        = "app-server"
+    Environment = "demo"
   }
 }
 
-output "small_instance_id" {
-  value = aws_instance.small.id
+output "web_instance_id" {
+  value = aws_instance.web.id
 }
 
-output "estimated_cost" {
-  value = var.enable_large_instance ? "~$280/month" : "~$8/month"
+output "app_instance_id" {
+  value = aws_instance.app.id
 }
