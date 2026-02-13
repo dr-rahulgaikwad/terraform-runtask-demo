@@ -42,6 +42,7 @@ variable "instance_type" {
   default = "t3.micro"
 }
 
+/*
 resource "aws_instance" "web" {
   ami           = "ami-0e2c8caa4b6378d8c"
   instance_type = var.instance_type
@@ -79,3 +80,4 @@ output "web_instance_id" {
 output "app_instance_id" {
   value = aws_instance.app.id
 }
+*/
