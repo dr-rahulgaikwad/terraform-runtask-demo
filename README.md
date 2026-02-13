@@ -4,57 +4,57 @@ Demo for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.com/dr-rahul
 
 ## Overview
 
-This demo runs exclusively in HCP Terraform using Doormat for dynamic AWS credentials. No static credentials required.
+Comprehensive demo with VPC, Security Groups, EC2, and S3 to generate meaningful AI analysis.
+
+## What the AI Analyzer Will Check
+
+✅ **EC2Validator**: Instance types, AMI validation  
+✅ **S3Validator**: Unencrypted bucket detection  
+✅ **SecurityGroupValidator**: SSH exposed to 0.0.0.0/0 (intentional for demo)  
+✅ **CostEstimator**: Monthly cost analysis with threshold alerts
 
 ## Prerequisites
 
-✅ IAM role created: `arn:aws:iam::825551243480:role/tfc-doormat-demo-role`
-- Tagged: `app.terraform.io/rahul-tfc/terraform-runtask-demo-ws`
-- Trusts: `arn:aws:iam::397512762488:user/doormatServiceUser`
-- Permissions: EC2 full access
+✅ IAM role: `arn:aws:iam::825551243480:role/tfc-doormat-demo-role`
 
-## HCP Terraform Workspace Setup
+## HCP Terraform Setup
 
 **Organization:** `rahul-tfc`  
 **Workspace:** `terraform-runtask-demo-ws`
 
-### Variables to Set
+### Variables
 
-**Terraform Variables:**
 - `aws_region` = `us-east-1`
-- `instance_type` = `t3.micro` (or `t3.medium`, `m5.2xlarge` for cost testing)
+- `instance_type` = `t3.micro`
+- `enable_large_instance` = `false` (set to `true` for cost alerts)
 
-**No AWS credentials needed** - Doormat provides them automatically!
+### Run Task
 
-### Run Task Configuration
 - Stage: Post-plan
 - Enforcement: Advisory
 
+## Expected AI Findings
+
+🔴 **Security Issues:**
+- SSH (port 22) exposed to 0.0.0.0/0
+- S3 bucket without encryption
+
+🟢 **Good Practices:**
+- EBS volumes encrypted
+- IMDSv2 enforced
+- VPC with proper networking
+
+💰 **Cost Analysis:**
+- Baseline: ~$25/month
+- With large instance: ~$300/month (triggers >20% alert)
+
 ## Usage
 
-1. Push this code to your VCS repository
-2. Connect repository to HCP Terraform workspace
-3. Queue a plan
-4. Doormat assumes IAM role and provides credentials
-5. AI Run Task analyzer evaluates the plan
-6. View AI analysis in Run Task output
+1. Push to VCS
+2. Queue plan in HCP Terraform
+3. View AI analysis in Run Task output
+4. Check "Bedrock-TF-Plan-Analyzer" section for detailed findings
 
-## What the AI Analyzer Checks
+## Demo Scenarios
 
-- EC2 instance type validation
-- AMI availability
-- Cost estimation (~$15/month for t3.micro, ~$280/month for m5.2xlarge)
-- Cost threshold alerts (>20% increase)
-
-## Testing Cost Scenarios
-
-Change `instance_type` variable in workspace:
-- `t3.micro` → ~$15/month baseline
-- `t3.medium` → ~$30/month
-- `m5.2xlarge` → ~$280/month (triggers cost alert)
-
-## Files
-
-- `main.tf` - Infrastructure code with Doormat integration
-- `DOORMAT_SETUP.md` - IAM role creation guide
-- `doormat-setup/` - One-time IAM role setup (already completed)
+Toggle `enable_large_instance` to see cost threshold alerts!
