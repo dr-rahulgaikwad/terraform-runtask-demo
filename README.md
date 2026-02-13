@@ -17,6 +17,7 @@ Demo repository for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.c
 - ✅ Encrypted S3 bucket with public access blocked
 - ✅ Encrypted EBS, IMDSv2 enforced
 - ✅ Cost-efficient instance (t3.micro)
+- ✅ Private subnet
 - **Result**: Run Task passes, apply proceeds
 
 ### Bad Example
@@ -24,6 +25,7 @@ Demo repository for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.c
 - 🔴 Unencrypted S3 bucket, public access allowed
 - 🔴 No EBS encryption, no IMDSv2
 - 🔴 Oversized instance (m5.4xlarge, ~$560/month)
+- 🔴 Public subnet with auto-assign public IP
 - **Result**: Run Task fails, apply blocked (if Mandatory)
 
 ## Setup
