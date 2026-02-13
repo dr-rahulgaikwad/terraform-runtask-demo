@@ -5,11 +5,31 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    doormat = {
+      source  = "doormat.hashicorp.services/hashicorp-security/doormat"
+      version = "~> 0.0.6"
+    }
+  }
+  cloud {
+    organization = "rahul-tfc"
+    workspaces {
+      name = "terraform-runtask-demo-ws"
+    }
   }
 }
 
+provider "doormat" {}
+
+data "doormat_aws_credentials" "creds" {
+  provider = doormat
+  role_arn = "arn:aws:iam::825551243480:role/tfc-doormat-demo-role"
+}
+
 provider "aws" {
-  region = var.aws_region
+  region     = var.aws_region
+  access_key = data.doormat_aws_credentials.creds.access_key
+  secret_key = data.doormat_aws_credentials.creds.secret_key
+  token      = data.doormat_aws_credentials.creds.token
 }
 
 variable "aws_region" {
