@@ -51,11 +51,11 @@ git push
 3. **Settings → General → Terraform Working Directory**: `bad-example`
 4. Save settings
 
-### Step 3: Configure AWS Credentials
+### Step 3: Configure Doormat Authentication
 
-In each workspace, add environment variables:
-- `AWS_ACCESS_KEY_ID` (mark as sensitive)
-- `AWS_SECRET_ACCESS_KEY` (mark as sensitive)
+**No variables needed!** Doormat provider is configured in the Terraform code.
+
+The IAM role `arn:aws:iam::825551243480:role/tfc-doormat-demo-role` is already created and will be used automatically by Doormat.
 
 ### Step 4: Configure Run Task
 

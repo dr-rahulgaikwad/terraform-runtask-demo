@@ -2,8 +2,11 @@ terraform {
   required_version = ">= 1.5.0"
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source = "hashicorp/aws"
+    }
+    doormat = {
+      source  = "doormat.hashicorp.services/hashicorp-security/doormat"
+      version = "~> 0.0.6"
     }
   }
   cloud {
@@ -14,8 +17,18 @@ terraform {
   }
 }
 
+provider "doormat" {}
+
+data "doormat_aws_credentials" "creds" {
+  provider = doormat
+  role_arn = "arn:aws:iam::825551243480:role/tfc-doormat-demo-role"
+}
+
 provider "aws" {
-  region = "us-east-1"
+  region     = "us-east-1"
+  access_key = data.doormat_aws_credentials.creds.access_key
+  secret_key = data.doormat_aws_credentials.creds.secret_key
+  token      = data.doormat_aws_credentials.creds.token
 }
 
 resource "aws_vpc" "main" {
