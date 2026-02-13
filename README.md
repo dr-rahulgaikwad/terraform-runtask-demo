@@ -1,60 +1,84 @@
-# Terraform AI Plan Analyzer Demo
+# Terraform Run Task AI Analyzer Demo
 
-Demo for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.com/dr-rahulgaikwad/terraform-runtask-aws-ai-tf-plan-analyzer).
+Demo repository for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.com/dr-rahulgaikwad/terraform-runtask-aws-ai-tf-plan-analyzer).
 
-## Overview
+## Repository Structure
 
-Comprehensive demo with VPC, Security Groups, EC2, and S3 to generate meaningful AI analysis.
+```
+├── good-example/     # Best practices - Run Task passes
+├── bad-example/      # Security issues - Run Task fails
+└── doormat-setup/    # IAM role for Doormat authentication
+```
 
-## What the AI Analyzer Will Check
+## Examples
 
-✅ **EC2Validator**: Instance types, AMI validation  
-✅ **S3Validator**: Unencrypted bucket detection  
-✅ **SecurityGroupValidator**: SSH exposed to 0.0.0.0/0 (intentional for demo)  
-✅ **CostEstimator**: Monthly cost analysis with threshold alerts
+### Good Example
+- ✅ Secure security groups (VPC-only access)
+- ✅ Encrypted S3 bucket with public access blocked
+- ✅ Encrypted EBS, IMDSv2 enforced
+- ✅ Cost-efficient instance (t3.micro)
+- **Result**: Run Task passes, apply proceeds
 
-## Prerequisites
+### Bad Example
+- 🔴 SSH/RDP/MySQL exposed to 0.0.0.0/0
+- 🔴 Unencrypted S3 bucket, public access allowed
+- 🔴 No EBS encryption, no IMDSv2
+- 🔴 Oversized instance (m5.4xlarge, ~$560/month)
+- **Result**: Run Task fails, apply blocked (if Mandatory)
 
-✅ IAM role: `arn:aws:iam::825551243480:role/tfc-doormat-demo-role`
+## Setup
 
-## HCP Terraform Setup
+### Step 1: Push to Git
 
-**Organization:** `rahul-tfc`  
-**Workspace:** `terraform-runtask-demo-ws`
+Ensure all files are committed and pushed:
+```bash
+git add .
+git commit -m "Add good and bad examples"
+git push
+```
 
-### Variables
+### Step 2: Create HCP Terraform Workspaces
 
-- `aws_region` = `us-east-1`
-- `instance_type` = `t3.micro`
-- `enable_large_instance` = `false` (set to `true` for cost alerts)
+**Good Example Workspace:**
+1. Create workspace: `good-example-ws`
+2. Connect to VCS (this repository)
+3. **Settings → General → Terraform Working Directory**: `good-example`
+4. Save settings
 
-### Run Task
+**Bad Example Workspace:**
+1. Create workspace: `bad-example-ws`
+2. Connect to VCS (this repository)
+3. **Settings → General → Terraform Working Directory**: `bad-example`
+4. Save settings
 
+### Step 3: Configure AWS Credentials
+
+In each workspace, add environment variables:
+- `AWS_ACCESS_KEY_ID` (mark as sensitive)
+- `AWS_SECRET_ACCESS_KEY` (mark as sensitive)
+
+### Step 4: Configure Run Task
+
+In each workspace:
+- Go to Settings → Run Tasks
+- Add the AI Plan Analyzer Run Task
 - Stage: Post-plan
-- Enforcement: Advisory
+- Enforcement:
+  - `good-example-ws`: Advisory
+  - `bad-example-ws`: Mandatory
 
-## Expected AI Findings
+### Step 5: Queue Plans
 
-🔴 **Security Issues:**
-- SSH (port 22) exposed to 0.0.0.0/0
-- S3 bucket without encryption
+Queue a plan in each workspace to see the AI analysis!
 
-🟢 **Good Practices:**
-- EBS volumes encrypted
-- IMDSv2 enforced
-- VPC with proper networking
+## Demo Flow
 
-💰 **Cost Analysis:**
-- Baseline: ~$25/month
-- With large instance: ~$300/month (triggers >20% alert)
+1. **Good Example**: Queue plan → AI analysis passes → Apply succeeds
+2. **Bad Example**: Queue plan → AI analysis fails → Apply blocked (if Mandatory)
 
-## Usage
+## What the AI Analyzer Checks
 
-1. Push to VCS
-2. Queue plan in HCP Terraform
-3. View AI analysis in Run Task output
-4. Check "Bedrock-TF-Plan-Analyzer" section for detailed findings
-
-## Demo Scenarios
-
-Toggle `enable_large_instance` to see cost threshold alerts!
+- EC2Validator: Instance types, AMI validation
+- S3Validator: Encryption, public access
+- SecurityGroupValidator: Port exposure, 0.0.0.0/0 rules
+- CostEstimator: Monthly costs, threshold alerts (>20%)
