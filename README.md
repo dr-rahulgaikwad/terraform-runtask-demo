@@ -12,21 +12,25 @@ Demo repository for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.c
 
 ## Examples
 
+## Examples
+
 ### Good Example
-- ✅ Secure security groups (VPC-only access)
-- ✅ Encrypted S3 bucket with public access blocked
-- ✅ Encrypted EBS, IMDSv2 enforced
-- ✅ Cost-efficient instance (t3.micro)
-- ✅ Private subnet
+- ✅ 6 subnets across 3 AZs (proper network design)
+- ✅ 2 EC2 instances with encryption and IMDSv2
+- ✅ 2 S3 buckets with AES256 encryption and versioning
+- ✅ Security group restricted to VPC CIDR
+- ✅ Private subnet placement
+- ✅ Cost-efficient (~$25/month)
 - **Result**: Run Task passes, apply proceeds
 
 ### Bad Example
-- 🔴 SSH/RDP/MySQL exposed to 0.0.0.0/0
-- 🔴 Unencrypted S3 bucket, public access allowed
-- 🔴 No EBS encryption, no IMDSv2
-- 🔴 Oversized instance (m5.4xlarge, ~$560/month)
-- 🔴 Public subnet with auto-assign public IP
-- **Result**: Run Task fails, apply blocked (if Mandatory)
+- 🔴 3 public subnets with auto-assign IPs
+- 🔴 2 large instances (m5.4xlarge, m5.2xlarge) without encryption
+- 🔴 2 unencrypted S3 buckets with public access
+- 🔴 SSH/RDP/MySQL/PostgreSQL exposed to 0.0.0.0/0
+- 🔴 No IMDSv2, no EBS encryption
+- 🔴 High cost (~$800/month, >300% increase)
+- **Result**: Run Task fails with 8+ critical findings, apply blocked (if Mandatory)
 
 ## Setup
 

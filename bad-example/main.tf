@@ -39,20 +39,78 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "public_a" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.1.0/24"
+  cidr_block              = "10.0.48.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "bad-public-subnet"
+    Name = "bad-public-1a"
   }
+}
+
+resource "aws_subnet" "public_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.49.0/24"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "bad-public-1b"
+  }
+}
+
+resource "aws_subnet" "public_c" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.50.0/24"
+  availability_zone       = "us-east-1c"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "bad-public-1c"
+  }
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "bad-igw"
+  }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name = "bad-public-rt"
+  }
+}
+
+resource "aws_route_table_association" "public_a" {
+  subnet_id      = aws_subnet.public_a.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_b" {
+  subnet_id      = aws_subnet.public_b.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_c" {
+  subnet_id      = aws_subnet.public_c.id
+  route_table_id = aws_route_table.public.id
 }
 
 resource "aws_security_group" "insecure" {
   name        = "bad-insecure-sg"
-  description = "Insecure security group"
+  description = "Insecure security group with multiple exposures"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -79,6 +137,14 @@ resource "aws_security_group" "insecure" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "PostgreSQL from anywhere"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -94,7 +160,7 @@ resource "aws_security_group" "insecure" {
 resource "aws_instance" "web" {
   ami                    = "ami-0e2c8caa4b6378d8c"
   instance_type          = "m5.4xlarge"
-  subnet_id              = aws_subnet.public.id
+  subnet_id              = aws_subnet.public_a.id
   vpc_security_group_ids = [aws_security_group.insecure.id]
 
   tags = {
@@ -102,11 +168,22 @@ resource "aws_instance" "web" {
   }
 }
 
-resource "aws_s3_bucket" "data" {
-  bucket = "bad-bucket-${data.aws_caller_identity.current.account_id}"
+resource "aws_instance" "db" {
+  ami                    = "ami-0e2c8caa4b6378d8c"
+  instance_type          = "m5.2xlarge"
+  subnet_id              = aws_subnet.public_b.id
+  vpc_security_group_ids = [aws_security_group.insecure.id]
 
   tags = {
-    Name = "bad-bucket"
+    Name = "bad-db-server"
+  }
+}
+
+resource "aws_s3_bucket" "data" {
+  bucket = "bad-data-bucket-${data.aws_caller_identity.current.account_id}"
+
+  tags = {
+    Name = "bad-data-bucket"
   }
 }
 
@@ -119,4 +196,24 @@ resource "aws_s3_bucket_public_access_block" "data" {
   restrict_public_buckets = false
 }
 
+resource "aws_s3_bucket" "backups" {
+  bucket = "bad-backups-bucket-${data.aws_caller_identity.current.account_id}"
+
+  tags = {
+    Name = "bad-backups-bucket"
+  }
+}
+
 data "aws_caller_identity" "current" {}
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+
+output "web_instance_id" {
+  value = aws_instance.web.id
+}
+
+output "db_instance_id" {
+  value = aws_instance.db.id
+}

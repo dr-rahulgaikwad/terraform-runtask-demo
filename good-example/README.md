@@ -1,21 +1,51 @@
 # Good Example - Best Practices
 
-This example demonstrates security best practices that will pass AI analysis.
+Comprehensive infrastructure demonstrating security best practices.
 
-## Features
+## Resources
 
-✅ **Security Group**: Restricted to VPC CIDR only  
-✅ **S3 Bucket**: Encrypted with AES256, public access blocked  
-✅ **EC2 Instance**: Encrypted EBS, IMDSv2 enforced, small instance type  
-✅ **Network**: Private subnet, no public IPs
+**Networking (6 subnets across 3 AZs)**
+- VPC with DNS enabled
+- 2 private subnets (10.0.1.0/24, 10.0.2.0/24)
+- 1 public subnet (10.0.10.0/24)
+- Internet Gateway
+- Route tables with proper associations
+
+**Compute**
+- 2 EC2 instances (t3.micro, t3.small)
+- Encrypted EBS volumes
+- IMDSv2 enforced
+- Private subnet placement
+
+**Storage**
+- 2 S3 buckets (data, logs)
+- AES256 encryption enabled
+- Versioning enabled on data bucket
+- Public access completely blocked
+
+**Security**
+- Security group restricted to VPC CIDR
+- HTTPS-only egress
+- No public exposure
 
 ## Expected AI Analysis
 
-🟢 All security checks pass  
-💰 Low cost (~$10/month)  
-✅ Run Task: **PASS** → Apply proceeds
+### Plan-Summary
+✅ 2 EC2 instances with proper security configuration  
+✅ 2 S3 buckets with encryption and access controls  
+✅ 6 subnets across 3 availability zones  
+✅ Proper network segmentation
 
-## HCP Terraform Setup
+### Impact-Analysis
+🟢 **Security**: All best practices followed  
+🟢 **Operational**: High availability with multi-AZ  
+💰 **Cost**: ~$25/month (cost-efficient)
 
-**Workspace**: `good-example-ws`  
-**Run Task Enforcement**: Advisory or Mandatory (will pass either way)
+### AMI-Summary
+✅ AMI validated and available  
+✅ Architecture: x86_64  
+✅ OS: Amazon Linux 2
+
+## Run Task Result
+
+✅ **PASS** → Apply proceeds

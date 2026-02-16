@@ -1,25 +1,64 @@
-# Bad Example - Security Issues
+# Bad Example - Security Anti-Patterns
 
-This example demonstrates security anti-patterns that will trigger AI warnings.
+Infrastructure with multiple security issues for demonstration.
 
-## Issues
+## Resources
 
-🔴 **Security Group**: SSH, RDP, MySQL exposed to 0.0.0.0/0  
-🔴 **S3 Bucket**: No encryption, public access allowed  
-🔴 **EC2 Instance**: No encryption, no IMDSv2, oversized (m5.4xlarge)  
-🔴 **Network**: Public subnet with auto-assign public IP  
-💰 **Cost**: High (~$560/month) - triggers threshold alert
+**Networking (3 public subnets)**
+- VPC without DNS configuration
+- 3 public subnets with auto-assign public IP
+- All subnets exposed to internet
+- No private subnets
+
+**Compute**
+- 2 large EC2 instances (m5.4xlarge, m5.2xlarge)
+- No EBS encryption
+- No IMDSv2
+- Public subnet placement
+
+**Storage**
+- 2 S3 buckets (data, backups)
+- No encryption
+- Public access allowed
+- No versioning
+
+**Security**
+- Security group exposes SSH, RDP, MySQL, PostgreSQL to 0.0.0.0/0
+- All egress allowed
+- Critical ports exposed
 
 ## Expected AI Analysis
 
-🔴 Multiple critical security findings  
-🔴 Cost threshold exceeded (>20%)  
-⚠️ Run Task: **FAIL**
+### Plan-Summary
+🔴 2 large EC2 instances without security hardening  
+🔴 2 unencrypted S3 buckets with public access  
+🔴 3 public subnets with auto-assign IPs  
+⚠️ No network segmentation
 
-- **Advisory mode**: Apply proceeds with warnings
-- **Mandatory mode**: Apply blocked
+### Impact-Analysis
+🔴 **Security**: Multiple critical vulnerabilities  
+  - SSH/RDP exposed to internet
+  - Database ports (3306, 5432) exposed
+  - Unencrypted storage
+  - Public S3 buckets
+  
+🔴 **Operational**: Single point of failure  
+💰 **Cost**: ~$800/month (exceeds threshold by >300%)
 
-## HCP Terraform Setup
+### AMI-Summary
+✅ AMI validated  
+⚠️ Using same AMI for web and database (not best practice)
 
-**Workspace**: `bad-example-ws`  
-**Run Task Enforcement**: Set to Mandatory to block apply
+## Run Task Result
+
+🔴 **FAIL** → Apply blocked (if Mandatory enforcement)
+
+### Critical Findings
+1. Security group allows SSH from 0.0.0.0/0
+2. Security group allows RDP from 0.0.0.0/0
+3. Security group allows MySQL from 0.0.0.0/0
+4. Security group allows PostgreSQL from 0.0.0.0/0
+5. S3 buckets allow public access
+6. S3 buckets not encrypted
+7. EC2 instances not encrypted
+8. Cost increase >300% (triggers threshold)
