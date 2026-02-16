@@ -5,16 +5,14 @@ Demo repository for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.c
 ## Repository Structure
 
 ```
-├── good-example/     # Best practices - Run Task passes
-├── bad-example/      # Security issues - Run Task fails
+├── example-1/        # Secure infrastructure - Run Task passes
+├── example-2/        # Infrastructure with issues - Run Task fails
 └── doormat-setup/    # IAM role for Doormat authentication
 ```
 
 ## Examples
 
-## Examples
-
-### Good Example
+### Example 1 - Secure Infrastructure
 - ✅ 6 subnets across 3 AZs (proper network design)
 - ✅ 2 EC2 instances with encryption and IMDSv2
 - ✅ 2 S3 buckets with AES256 encryption and versioning
@@ -23,7 +21,7 @@ Demo repository for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.c
 - ✅ Cost-efficient (~$25/month)
 - **Result**: Run Task passes, apply proceeds
 
-### Bad Example
+### Example 2 - Infrastructure with Issues
 - 🔴 3 public subnets with auto-assign IPs
 - 🔴 2 large instances (m5.4xlarge, m5.2xlarge) without encryption
 - 🔴 2 unencrypted S3 buckets with public access
@@ -39,22 +37,22 @@ Demo repository for [terraform-runtask-aws-ai-tf-plan-analyzer](https://github.c
 Ensure all files are committed and pushed:
 ```bash
 git add .
-git commit -m "Add good and bad examples"
+git commit -m "Add example-1 and example-2"
 git push
 ```
 
 ### Step 2: Create HCP Terraform Workspaces
 
-**Good Example Workspace:**
-1. Create workspace: `good-example-ws`
+**Example 1 Workspace:**
+1. Create workspace: `example-1-ws`
 2. Connect to VCS (this repository)
-3. **Settings → General → Terraform Working Directory**: `good-example`
+3. **Settings → General → Terraform Working Directory**: `example-1`
 4. Save settings
 
-**Bad Example Workspace:**
-1. Create workspace: `bad-example-ws`
+**Example 2 Workspace:**
+1. Create workspace: `example-2-ws`
 2. Connect to VCS (this repository)
-3. **Settings → General → Terraform Working Directory**: `bad-example`
+3. **Settings → General → Terraform Working Directory**: `example-2`
 4. Save settings
 
 ### Step 3: Configure Doormat Authentication
@@ -70,8 +68,8 @@ In each workspace:
 - Add the AI Plan Analyzer Run Task
 - Stage: Post-plan
 - Enforcement:
-  - `good-example-ws`: Advisory
-  - `bad-example-ws`: Mandatory
+  - `example-1-ws`: Advisory
+  - `example-2-ws`: Mandatory
 
 ### Step 5: Queue Plans
 
@@ -79,8 +77,8 @@ Queue a plan in each workspace to see the AI analysis!
 
 ## Demo Flow
 
-1. **Good Example**: Queue plan → AI analysis passes → Apply succeeds
-2. **Bad Example**: Queue plan → AI analysis fails → Apply blocked (if Mandatory)
+1. **Example 1**: Queue plan → AI analysis passes → Apply succeeds
+2. **Example 2**: Queue plan → AI analysis fails → Apply blocked (if Mandatory)
 
 ## What the AI Analyzer Checks
 
@@ -88,3 +86,16 @@ Queue a plan in each workspace to see the AI analysis!
 - S3Validator: Encryption, public access
 - SecurityGroupValidator: Port exposure, 0.0.0.0/0 rules
 - CostEstimator: Monthly costs, threshold alerts (>20%)
+
+## AI Analysis Output
+
+Each example generates three detailed sections:
+
+### Plan-Summary
+Summary of Terraform plan with resource counts and configurations
+
+### Impact-Analysis
+Security and operational impact assessment with severity levels
+
+### AMI-Summary
+Summary of AMI changes and validations
