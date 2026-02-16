@@ -1,5 +1,5 @@
 # running good example
-/*terraform {
+terraform {
   required_version = ">= 1.5.0"
   required_providers {
     aws = {
@@ -32,6 +32,7 @@ provider "aws" {
   token      = data.doormat_aws_credentials.creds.token
 }
 
+/*
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
