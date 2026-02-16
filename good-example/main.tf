@@ -1,5 +1,5 @@
 # running good example
-terraform {
+/*terraform {
   required_version = ">= 1.5.0"
   required_providers {
     aws = {
@@ -125,3 +125,5 @@ resource "aws_s3_bucket_public_access_block" "data" {
 }
 
 data "aws_caller_identity" "current" {}
+
+*/
