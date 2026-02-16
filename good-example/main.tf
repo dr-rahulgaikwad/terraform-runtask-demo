@@ -32,7 +32,7 @@ provider "aws" {
   token      = data.doormat_aws_credentials.creds.token
 }
 
-/*
+
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -126,5 +126,3 @@ resource "aws_s3_bucket_public_access_block" "data" {
 }
 
 data "aws_caller_identity" "current" {}
-
-*/
